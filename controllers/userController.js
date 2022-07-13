@@ -1,4 +1,4 @@
-import UserModel from '../models/userModel.js';
+import UserModel from '../models/UserModel.js';
 import { emailValidator } from "../helpers/emailValidator.js";
 import createJWT from '../helpers/createJWT.js';
 const registerUser = async (req, res) => {

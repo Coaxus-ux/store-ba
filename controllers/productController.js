@@ -1,6 +1,7 @@
-import ProductModel from "../models/ProductModel";
+import ProductModel from "../models/ProductModel.js";
 const addProduct = async (req, res) => {
-    const { name, description, price, category, userOwner } = req.body;
+    console.log(req.body);
+    const { name, userOwner } = req.body;
     const uniqueName = await ProductModel.findOne({ name, userOwner });
     if(uniqueName){
         return res.json({
@@ -23,14 +24,21 @@ const addProduct = async (req, res) => {
 const getProducts = async (req, res) => {
     const { userOwner, category } = req.body;
     const products = await ProductModel.find({ userOwner, category });
+    if(!products){
+        return res.json({
+            state: false,
+            msg: "No se encontraron productos",
+        });
+    }
     res.json({
         state: true,
         products: products
     });
 }
 const deleteProduct = async (req, res) => {
-    const { _id } = req.body;
-    const product = await ProductModel.findOne({ _id });
+    
+    const { _id, userOwner } = req.body;
+    const product = await ProductModel.findOne({ _id, userOwner });
     if(!product){
         return res.json({
             state: false,
@@ -49,4 +57,26 @@ const deleteProduct = async (req, res) => {
         console.log(`Error deleting product ${error}`);
     }
 }
-export { addProduct, getProducts, deleteProduct };
+const updateProduct = async (req, res) => {
+    console.log(req.body);
+    const { _id, name, category, price, description, userOwner } = req.body;
+    const product = await ProductModel.findOne({ _id });
+    if(!product){
+        return res.json({
+            state: false,
+            msg: "El producto no existe",
+        });
+    }
+    try{
+        const result = await ProductModel.updateOne({ _id }, { name, category, price, description, userOwner });
+        res.json({
+            state: true,
+            msg: "Producto actualizado correctamente",
+            result: result
+        });
+    }
+    catch(error){
+        console.log(`Error updating product ${error}`);
+    }
+}
+export { addProduct, getProducts, deleteProduct, updateProduct };
